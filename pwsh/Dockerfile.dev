@@ -1,0 +1,42 @@
+# This builds quicker during dev work.
+
+FROM mcr.microsoft.com/powershell:latest
+
+LABEL \
+  io.hass.version="0.1.1" \
+  io.hass.type="addon" \
+  io.hass.arch="amd64"
+
+ENV TZ=America/New_York
+
+ARG X1PASSWORD_URL=https://downloads.1password.com/linux/debian/amd64/stable/1password-cli-amd64-latest.deb
+ARG X1PASSWORD_DEB_PATH=/tmp/1password-cli-amd64-latest.deb
+
+RUN \
+  apt-get update \
+  && apt-get install locales tzdata curl -y \
+  && curl -fsSL ${X1PASSWORD_URL} -o ${X1PASSWORD_DEB_PATH} \
+  && dpkg -i ${X1PASSWORD_DEB_PATH} \
+  && rm -f ${X1PASSWORD_DEB_PATH}
+#  && locale-gen en_US.UTF-8 \
+#  && update-locale LANG=en_US.UTF-8
+
+# Set environment variables for locale
+#ENV LANG=en_US.UTF-8 \
+#    LANGUAGE=en_US:en \
+#    LC_ALL=en_US.UTF-8
+
+#RUN \
+#  apt-get update \
+#  && apt-get upgrade -y \
+#  && apt-get clean \
+#  && rm -rf /var/lib/apt/lists/*
+
+RUN \
+  ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+  && echo $TZ > /etc/timezone
+
+COPY Run-ScriptsAsThreads.ps1 /app/
+COPY Read-HassIoStdIn.ps1 /app/
+
+ENTRYPOINT ["pwsh","-NoProfile", "-NoLogo", "-NonInteractive","-File","/app/Run-ScriptsAsThreads.ps1"]

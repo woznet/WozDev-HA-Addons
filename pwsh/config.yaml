@@ -1,0 +1,29 @@
+name: "PowerShell"
+description: "Run PowerShell scripts in Home Assistant"
+version: "0.1.1"
+slug: "pwsh"
+init: false
+stdin: true
+arch:
+  - amd64
+startup: application
+url: "https://github.com/woznet/WozDev-HA-Addons/tree/main/pwsh"
+#ports:
+#  8000/tcp: 8000
+map:
+  - type: share
+    read_only: false
+  - type: addon_config
+homeassistant_api: true
+options:
+  scripts: []
+  threads: 5
+  ondemand: false
+schema:
+  scripts:
+    - filename: str
+      path: "str?"
+      args:
+        - "str?"
+  threads: "int(1,10)"
+  ondemand: bool
