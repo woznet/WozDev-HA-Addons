@@ -2,7 +2,6 @@ ARG BUILD_FROM=ghcr.io/hassio-addons/base:20.0.1
 # hadolint ignore=DL3006
 FROM ${BUILD_FROM}
 
-# Set workdir
 WORKDIR /opt
 
 # Copy Python requirements file
@@ -15,48 +14,42 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG UPTIME_KUMA_VERSION="2.1.3"
 ARG CLOUDFLARED_VERSION="2026.2.0"
 ARG BUILD_ARCH=amd64
+
 # hadolint ignore=DL3003,DL3042
 RUN \
     apk add --no-cache --virtual .build-dependencies \
-        build-base=0.5-r3 \
-        py3-pip=25.1.1-r0 \
-    \
+    build-base \
+    py3-pip \
     && apk add --no-cache \
-        iputils=20240905-r0 \
-        nodejs=22.22.0-r0 \
-        npm=11.6.4-r0 \
-        python3=3.12.12-r0 \
-        setpriv=2.41-r9 \
-    \
+    iputils \
+    nodejs \
+    npm \
+    python3 \
+    setpriv \
     && mkdir -p /opt/uptime-kuma \
     && curl -L -s "https://github.com/louislam/uptime-kuma/archive/refs/tags/${UPTIME_KUMA_VERSION}.tar.gz" \
-        | tar zxvf - --strip-components 1 -C /opt/uptime-kuma \
-    \
+    | tar zxvf - --strip-components 1 -C /opt/uptime-kuma \
     && cd /opt/uptime-kuma \
-    \
-    && pip install -r /opt/requirements.txt \
-    \
+    && pip3 install -r /opt/requirements.txt \
     && npm ci \
-        --no-audit \
-        --no-fund \
-        --no-update-notifier \
-        --omit=dev \
+    --no-audit \
+    --no-fund \
+    --no-update-notifier \
+    --omit=dev \
     && npm run download-dist \
-    \
     && if [ "${BUILD_ARCH}" = "aarch64" ]; then CLOUDFLARED_ARCH="arm64"; \
-    elif [ "${BUILD_ARCH}" = "amd64" ]; then CLOUDFLARED_ARCH="amd64"; fi \
+    elif [ "${BUILD_ARCH}" = "amd64" ]; then CLOUDFLARED_ARCH="amd64"; \
+    else echo "Unsupported BUILD_ARCH: ${BUILD_ARCH}" >&2; exit 2; fi \
     && curl -L --fail -o /usr/bin/cloudflared \
-        "https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSION}/cloudflared-linux-${CLOUDFLARED_ARCH}" \
+    "https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSION}/cloudflared-linux-${CLOUDFLARED_ARCH}" \
     && chmod +x /usr/bin/cloudflared \
-    \
     && npm cache clear --force \
-    \
     && apk del --no-cache --purge .build-dependencies \
     && rm -fr \
-        /tmp/* \
-        /root/.cache \
-        /root/.npm \
-        /root/.npmrc
+    /tmp/* \
+    /root/.cache \
+    /root/.npm \
+    /root/.npmrc
 
 # Copy root filesystem
 COPY rootfs /
@@ -68,7 +61,6 @@ ARG BUILD_NAME
 ARG BUILD_REF
 ARG BUILD_REPOSITORY
 ARG BUILD_VERSION
-
 
 # Labels
 LABEL \
