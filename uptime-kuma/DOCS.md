@@ -1,4 +1,4 @@
-# Home Assistant Community Add-on: Uptime Kuma Woz Edition
+# Home Assistant Community Add-on: Uptime Kuma
 
 Uptime Kuma is an open source monitor tools, which can be best
 compared to a self-hosted variant of a commercial service like "Uptime Robot".
@@ -90,14 +90,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 [addon-badge]: https://my.home-assistant.io/badges/supervisor_addon.svg
-[addon]: https://my.home-assistant.io/redirect/supervisor_addon/?addon=uptime-kuma-woz&repository_url=https%3A%2F%2Fgithub.com%2Fwoznet%2FWozDev-HA-Addons
-[contributors]: https://github.com/woznet/WozDev-HA-Addons/graphs/contributors
+[addon]: https://my.home-assistant.io/redirect/supervisor_addon/?addon=a0d7b954_uptime-kuma&repository_url=https%3A%2F%2Fgithub.com%2Fhassio-addons%2Frepository
+[contributors]: https://github.com/hassio-addons/addon-uptime-kuma/graphs/contributors
 [discord-ha]: https://discord.gg/c5DvZ4e
 [discord]: https://discord.me/hassioaddons
 [forum]: https://community.home-assistant.io/?u=frenck
 [frenck]: https://github.com/frenck
-[issue]: https://github.com/woznet/WozDev-HA-Addons/issues
+[issue]: https://github.com/hassio-addons/addon-uptime-kuma/issues
 [reddit]: https://reddit.com/r/homeassistant
-[releases]: https://github.com/woznet/WozDev-HA-Addons/releases
+[releases]: https://github.com/hassio-addons/addon-uptime-kuma/releases
 [semver]: https://semver.org/spec/v2.0.0.html
-[keepchangelog]: https://keepachangelog.com/
