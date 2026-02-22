@@ -29,6 +29,92 @@ $OPTIONS_FILE = '/data/options.json'
 # Read and convert the JSON file to a PowerShell object - we'll use these to get data from the user for use later.
 $OPTIONS = Get-Content $OPTIONS_FILE | ConvertFrom-Json -ErrorAction Stop
 
+#region Automated Module Management
+$Modules = $OPTIONS.ps_modules
+if ($null -ne $Modules -and $Modules.Count -gt 0) {
+    $ModulePath = '/data/psmodules'
+
+    if (-not (Test-Path $ModulePath)) {
+        $null = New-Item -Path $ModulePath -ItemType Directory
+    }
+
+    # Prepend our persistent module path using the OS-aware path separator
+    $CurrentPaths = $env:PSModulePath -split [System.IO.Path]::PathSeparator
+    if ($ModulePath -notin $CurrentPaths) {
+        $env:PSModulePath = @($ModulePath, $CurrentPaths) -join [System.IO.Path]::PathSeparator
+    }
+
+    $ModuleBanner = @'
+#####################################
+## Installing/Updating PS Modules  ##
+#####################################
+'@
+    Write-ColoredBlock -Text $ModuleBanner -Style $PSStyle.Foreground.Cyan
+
+    # Ensure the gallery is trusted so it doesn't prompt for confirmation
+    Set-PSResourceRepository -Name PSGallery -Trusted
+
+    foreach ($Mod in $Modules) {
+        $ModuleName = $Mod.name
+        Write-ColoredBlock -Text (' -> Checking: {0}' -f $ModuleName) -Style $PSStyle.Foreground.Cyan
+
+        # Define the base parameters that every module installation needs
+        $InstallParams = @{
+            Name = $ModuleName
+            Path = $ModulePath
+            SkipDependencyCheck = $false
+            ErrorAction = 'Continue'
+        }
+
+        # Optionally add the version if the user provided one
+        if (-not [string]::IsNullOrWhiteSpace($Mod.version)) {
+            $InstallParams.Version = $Mod.version
+        }
+
+        # Optionally add the prerelease flag if the user checked the box
+        if ($Mod.prerelease -eq $true) {
+            $InstallParams.Prerelease = $true
+        }
+
+        try {
+            # Use Splatting (@InstallParams) to pass the hashtable as command parameters
+            Install-PSResource @InstallParams
+        }
+        catch {
+            Write-ColoredBlock -Text ('    Failed to install {0}: {1}' -f $ModuleName, $_.Exception.Message) -Style $PSStyle.Foreground.Red
+        }
+    }
+}
+#endregion
+
+#region Custom Module Paths ---
+$CustomPaths = $OPTIONS.custom_module_paths
+if ($null -ne $CustomPaths -and $CustomPaths.Count -gt 0) {
+    # Get the current paths as an array
+    $CurrentPaths = $env:PSModulePath -split [System.IO.Path]::PathSeparator
+    $PathsToAdd = [System.Collections.Generic.List[string]]::new()
+
+    foreach ($Path in $CustomPaths) {
+        # Verify the path actually exists and is a directory
+        if (Test-Path -Path $Path -PathType Container) {
+            # Only add it if it isn't already in our list
+            if ($Path -notin $CurrentPaths -and $Path -notin $PathsToAdd) {
+                $PathsToAdd.Add($Path)
+            }
+        }
+        else {
+            Write-ColoredBlock -Text ('WARNING: Custom module path not found or invalid: {0}' -f $Path) -Style $PSStyle.Foreground.Yellow
+        }
+    }
+
+    # If we found valid paths, prepend them to the environment variable
+    if ($PathsToAdd.Count -gt 0) {
+        $env:PSModulePath = @($PathsToAdd, $CurrentPaths) -join [System.IO.Path]::PathSeparator
+        Write-ColoredBlock -Text ('Added {0} custom path(s) to PSModulePath.' -f $PathsToAdd.Count) -Style $PSStyle.Foreground.Cyan
+    }
+}
+#endregion
+
 # Throttle Limit defines the number of scripts that will be started as threads by *this* script.
 # Bear in mind that if the `Scripts` list's first n scripts run as infinite loops, any scripts over
 # the Throttle Limit will never start (and will spam the logs too). So you'll either need to increase
@@ -37,7 +123,7 @@ $ThreadThrottleLimit = [int]$OPTIONS.threads
 
 # Colors for banner information during startup etc.
 $Green = $PSStyle.Foreground.Green
-$BlackBg = $PSStyle.Background.Black
+# $BlackBg = $PSStyle.Background.Black
 $Red = $PSStyle.Foreground.Red
 $Reset = $PSStyle.Reset
 
@@ -49,7 +135,7 @@ if ($OPTIONS.scripts.length -gt 10) {
 # /mnt/data/supervisor/addons/data/local_pwsh is mapped from the host to the container as /data and where options.json lives.
 # We want the share folder to map to the container so the user places their scripts there.
 $DefaultScriptLocation = '/share/pwsh/'
-if (!(Test-Path $DefaultScriptLocation)) {
+if (-not (Test-Path $DefaultScriptLocation)) {
     $FolderBanner = @'
 #####################################
 ## Creating /share/pwsh folder...  ##
@@ -272,6 +358,10 @@ while ($Jobs = Get-Job) {
             }
         }
     }
+    #region Docker Healthcheck Heartbeat
+    # Updates the file modification time so Docker knows the script is still cycling
+    Set-Content -Path /tmp/heartbeat -Value 'alive'
+    #endregion
     Start-Sleep -Seconds 10
 }
 

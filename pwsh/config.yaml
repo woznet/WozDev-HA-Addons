@@ -1,6 +1,6 @@
 name: "PowerShell"
 description: "Run PowerShell scripts in Home Assistant"
-version: "0.1.1"
+version: "0.1.2"
 slug: "pwsh"
 init: false
 stdin: true
@@ -17,6 +17,8 @@ map:
 homeassistant_api: true
 options:
   scripts: []
+  ps_modules: []
+  custom_module_paths: []
   threads: 5
   ondemand: false
 schema:
@@ -25,5 +27,11 @@ schema:
       path: "str?"
       args:
         - "str?"
+  ps_modules:
+    - name: str
+      version: "str?"
+      prerelease: "bool?"
+  custom_module_paths:
+    - str
   threads: "int(1,10)"
   ondemand: bool

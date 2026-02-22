@@ -134,6 +134,14 @@ For a more secure approach, you could consider making use of the [SecretManageme
 
 ## How do I use my own/PowerShell Gallery modules?
 
+### The Easy Way
+
+Simply add the name of the module (e.g., `Microsoft.PowerShell.SecretManagement`) to the `PowerShell Modules` list in the add-on's Configuration tab.
+
+When the add-on starts, it will automatically download the latest version of the module and place it in persistent storage. Because the add-on automatically adds this location to the environment path, you don't even need to use `Import-Module` in your scripts! The commands will just be natively available.
+
+### The Manual Way
+
 With this add-on being a container, you must consider how you handle modules across upgrades since installing modules with `Install-Module` will work, but when you upgrade, the new container image won't have those modules installed. It's the same reason you store your scripts outside of the container in `share` or `addon_configs`.
 
 For simplicity, my suggestion is that you use `Save-PSResource` ( `Save-Module` is an alias of `Save-PSResource`) and specify the location where you want to store the module. Copy something like this in to a script and configure the add-on to run it as an On-Demand script:

@@ -16,11 +16,6 @@ sensor. We also check for the existence of a file which allows us to escape from
 the `while` loop when we need to.
 
 ```powershell
-# The container defaults to US style date and time format.
-# $CultureInfo = [cultureinfo]::new('en-US')
-# [System.Threading.Thread]::CurrentThread.CurrentCulture = $CultureInfo
-# [System.Threading.Thread]::CurrentThread.CurrentUICulture = $CultureInfo
-
 $homeAssistantSensor = 'sensor.pwsh_test_script'
 $homeAssistantToken = $env:SUPERVISOR_TOKEN
 

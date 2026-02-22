@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2 - 2026-02-22
+
+- Added automated PowerShell Gallery module management (`ps_modules` configuration) with version pinning and prerelease support.
+- Added support for mapping user-defined custom PowerShell module paths (`custom_module_paths` configuration).
+- Added an internal Docker Healthcheck to automatically monitor and restart the add-on if the main script deadlocks.
+
 ## 0.1.1 - 2026-02-20
 
 - Added pass pwsh args capablity
