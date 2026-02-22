@@ -5,14 +5,31 @@ configuration:
     description: >-
       A list of filenames of scripts you wish to run at startup.
       Optionally provide a path: with trailing slash eg. /share/mynetworkshare/
+
+  ps_modules:
+    name: PowerShell Modules
+    description: >-
+      A list of PowerShell module names from the PowerShell Gallery to automatically
+      download and install at startup. These will be automatically available to all your scripts.
+      You can optionally specify a Version (e.g., '2.1.0' or '2.*') and check Prerelease
+      if you want to allow downloading prerelease/beta versions.
+
+  custom_module_paths:
+    name: Custom Module Paths
+    description: >-
+      A list of custom folder paths (e.g., /share/my_custom_modules/) to add to the
+      PowerShell environment path. This allows your scripts to automatically discover
+      and import modules stored in these locations without needing to specify the full path.
+
   threads:
     name: Throttle/Thread Limit
     description: >-
       The thread limit for the number of jobs to be launched. Threading is
-      handled automatically with jobs/scripts waiting for a slot when you want 
+      handled automatically with jobs/scripts waiting for a slot when you want
       to run more scripts than the set Throttle Limit.
       Ensure you don't set all your scripts to run in infinite loops or some
       may never run if there are inadequate threads available.
+
   ondemand:
     name: On-Demand Mode
     description: >-

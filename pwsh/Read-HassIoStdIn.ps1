@@ -57,7 +57,6 @@ while ($true) {
     $RedFg = $PSStyle.Foreground.Red
     $BlackBg = $PSStyle.Background.Black
     $BlueFg = $PSStyle.Foreground.Blue
-    $Reset = $PSStyle.Reset
 
     if (-not $Scripts) {
         $ErrorBanner = @'
