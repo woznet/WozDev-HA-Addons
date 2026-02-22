@@ -91,22 +91,14 @@ RUN apk add --no-cache \
   -NoLogo \
   -NoProfile \
   -Command " \
-  \$ErrorActionPreference = 'Stop'; \$ProgressPreference = 'SilentlyContinue'; \
-  while(-not (Test-Path -Path \$env:PSModuleAnalysisCachePath)) { \
-  Write-Host \"Waiting for \$env:PSModuleAnalysisCachePath\"; \
-  Start-Sleep -Seconds 6; \
+  \$ErrorActionPreference = 'Stop' ; \
+  \$ProgressPreference = 'SilentlyContinue' ; \
+  while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) { \
+  Write-Host "Waiting for \$PSModuleAnalysisCachePath" ; \
+  Start-Sleep -Seconds 6 ; \
   }"
 
 COPY Run-ScriptsAsThreads.ps1 /app/
 COPY Read-HassIoStdIn.ps1 /app/
-
-# --- NEW: Watchdog Healthcheck ---
-# Define the maximum allowed age (in seconds) for the heartbeat file.
-ENV HEARTBEAT_TIMEOUT_SECONDS=120
-
-# Checks if the heartbeat file exists and was modified within the timeout limit.
-HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-  CMD [ -f /tmp/heartbeat ] && [ $(expr $(date +%s) - $(stat -c %Y /tmp/heartbeat)) -le $HEARTBEAT_TIMEOUT_SECONDS ] || exit 1
-# ---------------------------------
 
 ENTRYPOINT ["pwsh","-NoProfile", "-NoLogo", "-NonInteractive","-File","/app/Run-ScriptsAsThreads.ps1"]
