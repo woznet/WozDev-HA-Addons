@@ -3,7 +3,7 @@ ARG BUILD_FROM
 FROM $BUILD_FROM AS installer-env
 
 # PowerShell (pwsh)
-ARG PS_VERSION=7.5.4
+ARG PS_VERSION=7.6.0
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-musl-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
