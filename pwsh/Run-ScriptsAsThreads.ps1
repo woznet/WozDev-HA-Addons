@@ -1,8 +1,3 @@
-# Set up some stuff we only need to do once.
-# Set the culture to British English, since I'm British.
-#$CultureInfo = [cultureinfo]::new('en-US')
-#[System.Threading.Thread]::CurrentThread.CurrentCulture = $CultureInfo
-#[System.Threading.Thread]::CurrentThread.CurrentUICulture = $CultureInfo
 
 function Write-ColoredBlock {
     param(

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.3 - 2026-04-19
+
+- Bump PowerShell to 7.6.0
+- Remove deprecated `build.yaml` to resolve Supervisor build warnings.
+- Move build labels and metadata directly into `Dockerfile`.
+- Update Home Assistant base image to `3.23`.
+
 ## 0.1.2 - 2026-02-22
 
 - Added automated PowerShell Gallery module management (`ps_modules` configuration) with version pinning and prerelease support.

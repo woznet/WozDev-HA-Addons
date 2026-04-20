@@ -1,6 +1,14 @@
-# Dockerfile reference: https://github.com/PowerShell/PowerShell-Docker/blob/master/release/7-4/alpine317/docker/Dockerfile
-ARG BUILD_FROM
+ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base:3.23
 FROM $BUILD_FROM AS installer-env
+
+LABEL \
+  org.opencontainers.image.title="PowerShell" \
+  org.opencontainers.image.description="Run PowerShell scripts in Home Assistant" \
+  org.opencontainers.image.source="https://github.com/woznet/WozDev-HA-Addons/tree/main/pwsh" \
+  org.opencontainers.image.licenses="Apache License 2.0" \
+  io.hass.version="0.1.3" \
+  io.hass.type="app" \
+  io.hass.arch="amd64"
 
 # PowerShell (pwsh)
 ARG PS_VERSION=7.6.0
@@ -10,7 +18,7 @@ ARG PS_INSTALL_VERSION=7
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 
 # 1Password CLI (op)
-ARG OP_CLI_VERSION=2.32.1
+ARG OP_CLI_VERSION=2.34.0
 ARG OP_CLI_PACKAGE=op_linux_amd64_v${OP_CLI_VERSION}.zip
 ARG OP_CLI_URL=https://cache.agilebits.com/dist/1P/op2/pkg/v${OP_CLI_VERSION}/${OP_CLI_PACKAGE}
 ENV OP_CLI_INSTALL_FOLDER=/opt/1password-cli
@@ -48,7 +56,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
   LANG=en_US.UTF-8 \
   # set a fixed location for the Module analysis cache
   PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-  POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Alpine-3.20
+  POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Alpine-3.23
 
 # Install dotnet dependencies and ca-certificates
 RUN apk add --no-cache \
@@ -100,8 +108,7 @@ RUN apk add --no-cache \
 COPY Run-ScriptsAsThreads.ps1 /app/
 COPY Read-HassIoStdIn.ps1 /app/
 
-# --- NEW: Watchdog Healthcheck ---
-# Define the maximum allowed age (in seconds) for the heartbeat file.
+# --- Watchdog Healthcheck ---
 ENV HEARTBEAT_TIMEOUT_SECONDS=120
 
 # Checks if the heartbeat file exists and was modified within the timeout limit.
